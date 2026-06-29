@@ -260,7 +260,7 @@ function toggleHabit(id: number) {
                             <p class="text-xs text-muted-foreground">
                                 {{
                                     habit.current_streak > 0
-                                        ? `${habit.current_streak} day streak`
+                                        ? `${habit.current_streak} ${habit.cadence === 'weekly' ? 'week' : 'day'} streak`
                                         : 'Start a streak today'
                                 }}
                             </p>

@@ -169,7 +169,10 @@ function toggle(habit: HabitItem) {
                                 <span class="font-semibold text-foreground">{{
                                     habit.current_streak
                                 }}</span>
-                                day streak
+                                {{
+                                    habit.cadence === 'weekly' ? 'week' : 'day'
+                                }}
+                                streak
                             </span>
                             <span>best {{ habit.longest_streak }}</span>
                         </div>
