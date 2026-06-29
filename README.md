@@ -1,10 +1,18 @@
-# Tend
+<p align="center">
+  <img src="public/tend-logo.png" alt="Tend — habit tracker & todo list" width="260">
+</p>
 
-A personal task and habit manager that keeps a long to-do list from getting
-overwhelming. Tasks sort into two intent-based lanes, habits build streaks, and a
-lightweight insights panel nudges you toward what matters today.
+<h1 align="center">Tend</h1>
 
-Built with Laravel + Inertia + Vue, with a clean, Splitwise-inspired interface.
+<p align="center">
+  A personal task and habit manager that keeps a long to-do list from getting overwhelming.<br>
+  Tasks sort into two intent-based lanes, habits build streaks, and a lightweight insights
+  panel nudges you toward what matters today.
+</p>
+
+<p align="center">
+  Built with Laravel + Inertia + Vue, with a clean, Splitwise-inspired interface.
+</p>
 
 ## Features
 

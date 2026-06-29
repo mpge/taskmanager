@@ -9,9 +9,11 @@
 
 @theme inline {
     --font-sans:
-        Instrument Sans, ui-sans-serif, system-ui, sans-serif,
+        'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
+    --font-display:
+        'Quicksand', 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -41,6 +43,9 @@
     --color-destructive: var(--destructive);
     --color-destructive-foreground: var(--destructive-foreground);
 
+    --color-success: var(--success);
+    --color-success-foreground: var(--success-foreground);
+
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
@@ -50,6 +55,12 @@
     --color-chart-3: var(--chart-3);
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
+
+    --color-growth-0: var(--growth-0);
+    --color-growth-1: var(--growth-1);
+    --color-growth-2: var(--growth-2);
+    --color-growth-3: var(--growth-3);
+    --color-growth-4: var(--growth-4);
 
     --color-sidebar: var(--sidebar-background);
     --color-sidebar-foreground: var(--sidebar-foreground);
@@ -65,9 +76,6 @@
   The default border color has changed to `currentColor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
   looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
 */
 @layer base {
     *,
@@ -75,7 +83,7 @@
     ::before,
     ::backdrop,
     ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
+        border-color: var(--color-border, currentColor);
     }
 }
 
@@ -83,83 +91,104 @@
     body,
     html {
         --font-sans:
-            'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+            'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif,
             'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
             'Noto Color Emoji';
     }
 }
 
+/* Tend — green "garden" light theme (matches the brand logo) */
 :root {
-    --background: hsl(0 0% 100%);
-    --foreground: hsl(0 0% 3.9%);
+    --background: hsl(150 22% 97%);
+    --foreground: hsl(156 44% 13%);
     --card: hsl(0 0% 100%);
-    --card-foreground: hsl(0 0% 3.9%);
+    --card-foreground: hsl(156 44% 13%);
     --popover: hsl(0 0% 100%);
-    --popover-foreground: hsl(0 0% 3.9%);
-    --primary: hsl(0 0% 9%);
-    --primary-foreground: hsl(0 0% 98%);
-    --secondary: hsl(0 0% 92.1%);
-    --secondary-foreground: hsl(0 0% 9%);
-    --muted: hsl(0 0% 96.1%);
-    --muted-foreground: hsl(0 0% 45.1%);
-    --accent: hsl(0 0% 96.1%);
-    --accent-foreground: hsl(0 0% 9%);
-    --destructive: hsl(0 84.2% 60.2%);
-    --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(0 0% 92.8%);
-    --input: hsl(0 0% 89.8%);
-    --ring: hsl(0 0% 3.9%);
-    --chart-1: hsl(12 76% 61%);
-    --chart-2: hsl(173 58% 39%);
-    --chart-3: hsl(197 37% 24%);
-    --chart-4: hsl(43 74% 66%);
-    --chart-5: hsl(27 87% 67%);
-    --radius: 0.5rem;
-    --sidebar-background: hsl(0 0% 98%);
-    --sidebar-foreground: hsl(240 5.3% 26.1%);
-    --sidebar-primary: hsl(0 0% 10%);
-    --sidebar-primary-foreground: hsl(0 0% 98%);
-    --sidebar-accent: hsl(0 0% 94%);
-    --sidebar-accent-foreground: hsl(0 0% 30%);
-    --sidebar-border: hsl(0 0% 91%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
-    --sidebar: hsl(0 0% 98%);
+    --popover-foreground: hsl(156 44% 13%);
+    --primary: hsl(154 46% 27%);
+    --primary-foreground: hsl(150 30% 98%);
+    --secondary: hsl(150 20% 92%);
+    --secondary-foreground: hsl(156 35% 18%);
+    --muted: hsl(150 18% 94%);
+    --muted-foreground: hsl(154 12% 38%);
+    --accent: hsl(150 26% 89%);
+    --accent-foreground: hsl(156 35% 18%);
+    --destructive: hsl(8 62% 47%);
+    --destructive-foreground: hsl(150 30% 98%);
+    --success: hsl(148 50% 36%);
+    --success-foreground: hsl(150 30% 98%);
+    --border: hsl(150 16% 88%);
+    --input: hsl(150 14% 83%);
+    --ring: hsl(154 46% 27%);
+    --chart-1: hsl(154 46% 32%);
+    --chart-2: hsl(168 40% 38%);
+    --chart-3: hsl(130 36% 44%);
+    --chart-4: hsl(40 60% 50%);
+    --chart-5: hsl(200 40% 45%);
+    --radius: 0.875rem;
+
+    /* habit "growth" ramp — empty → deep forest green */
+    --growth-0: hsl(150 16% 90%);
+    --growth-1: hsl(146 32% 75%);
+    --growth-2: hsl(150 36% 57%);
+    --growth-3: hsl(152 46% 39%);
+    --growth-4: hsl(156 56% 24%);
+
+    --sidebar-background: hsl(150 22% 95%);
+    --sidebar-foreground: hsl(156 24% 26%);
+    --sidebar-primary: hsl(154 46% 27%);
+    --sidebar-primary-foreground: hsl(150 30% 98%);
+    --sidebar-accent: hsl(150 28% 88%);
+    --sidebar-accent-foreground: hsl(154 44% 22%);
+    --sidebar-border: hsl(150 16% 86%);
+    --sidebar-ring: hsl(154 46% 27%);
+    --sidebar: hsl(150 22% 95%);
 }
 
+/* Tend — green dark theme */
 .dark {
-    --background: hsl(0 0% 3.9%);
-    --foreground: hsl(0 0% 98%);
-    --card: hsl(0 0% 3.9%);
-    --card-foreground: hsl(0 0% 98%);
-    --popover: hsl(0 0% 3.9%);
-    --popover-foreground: hsl(0 0% 98%);
-    --primary: hsl(0 0% 98%);
-    --primary-foreground: hsl(0 0% 9%);
-    --secondary: hsl(0 0% 14.9%);
-    --secondary-foreground: hsl(0 0% 98%);
-    --muted: hsl(0 0% 16.08%);
-    --muted-foreground: hsl(0 0% 63.9%);
-    --accent: hsl(0 0% 14.9%);
-    --accent-foreground: hsl(0 0% 98%);
-    --destructive: hsl(0 84% 60%);
-    --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(0 0% 14.9%);
-    --input: hsl(0 0% 14.9%);
-    --ring: hsl(0 0% 83.1%);
-    --chart-1: hsl(220 70% 50%);
-    --chart-2: hsl(160 60% 45%);
-    --chart-3: hsl(30 80% 55%);
-    --chart-4: hsl(280 65% 60%);
-    --chart-5: hsl(340 75% 55%);
-    --sidebar-background: hsl(0 0% 7%);
-    --sidebar-foreground: hsl(0 0% 95.9%);
-    --sidebar-primary: hsl(360, 100%, 100%);
-    --sidebar-primary-foreground: hsl(0 0% 100%);
-    --sidebar-accent: hsl(0 0% 15.9%);
-    --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-    --sidebar-border: hsl(0 0% 15.9%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
-    --sidebar: hsl(240 5.9% 10%);
+    --background: hsl(156 24% 8%);
+    --foreground: hsl(150 16% 90%);
+    --card: hsl(156 20% 11%);
+    --card-foreground: hsl(150 16% 90%);
+    --popover: hsl(156 20% 11%);
+    --popover-foreground: hsl(150 16% 90%);
+    --primary: hsl(150 46% 46%);
+    --primary-foreground: hsl(156 35% 9%);
+    --secondary: hsl(154 14% 18%);
+    --secondary-foreground: hsl(150 16% 90%);
+    --muted: hsl(154 14% 18%);
+    --muted-foreground: hsl(150 12% 62%);
+    --accent: hsl(154 14% 21%);
+    --accent-foreground: hsl(150 16% 90%);
+    --destructive: hsl(8 64% 52%);
+    --destructive-foreground: hsl(150 20% 95%);
+    --success: hsl(148 50% 48%);
+    --success-foreground: hsl(156 35% 9%);
+    --border: hsl(154 12% 21%);
+    --input: hsl(154 12% 25%);
+    --ring: hsl(150 46% 46%);
+    --chart-1: hsl(150 46% 50%);
+    --chart-2: hsl(168 44% 48%);
+    --chart-3: hsl(130 40% 52%);
+    --chart-4: hsl(40 62% 56%);
+    --chart-5: hsl(200 44% 54%);
+
+    --growth-0: hsl(154 10% 18%);
+    --growth-1: hsl(150 20% 28%);
+    --growth-2: hsl(150 30% 37%);
+    --growth-3: hsl(150 40% 47%);
+    --growth-4: hsl(148 52% 58%);
+
+    --sidebar-background: hsl(156 22% 10%);
+    --sidebar-foreground: hsl(150 14% 82%);
+    --sidebar-primary: hsl(150 46% 46%);
+    --sidebar-primary-foreground: hsl(156 35% 9%);
+    --sidebar-accent: hsl(154 14% 17%);
+    --sidebar-accent-foreground: hsl(150 16% 90%);
+    --sidebar-border: hsl(154 12% 17%);
+    --sidebar-ring: hsl(150 46% 46%);
+    --sidebar: hsl(156 22% 10%);
 }
 
 @layer base {

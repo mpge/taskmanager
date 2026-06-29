@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HabitController;
 use App\Http\Controllers\HabitEntryController;
 use App\Http\Controllers\TaskController;
@@ -8,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 Route::inertia('/', 'Welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('tasks', [TaskController::class, 'index'])->name('tasks.index');
     Route::post('tasks', [TaskController::class, 'store'])->name('tasks.store');

@@ -6,9 +6,8 @@ use App\Enums\HabitCadence;
 use App\Http\Requests\StoreHabitRequest;
 use App\Http\Requests\UpdateHabitRequest;
 use App\Models\Habit;
-use App\Models\HabitEntry;
 use App\Models\User;
-use App\Support\StreakCalculator;
+use App\Support\HabitPresenter;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,7 +17,7 @@ use Inertia\Response;
 
 class HabitController extends Controller
 {
-    public function __construct(private readonly StreakCalculator $streaks) {}
+    public function __construct(private readonly HabitPresenter $presenter) {}
 
     public function index(Request $request): Response
     {
@@ -27,14 +26,15 @@ class HabitController extends Controller
 
         $today = CarbonImmutable::now();
 
-        $habits = $user->habits()
-            ->where('is_active', true)
-            ->orderBy('position')
-            ->orderBy('id')
-            ->with('entries')
-            ->get()
-            ->map(fn (Habit $habit): array => $this->present($habit, $today))
-            ->all();
+        $habits = $this->presenter->collection(
+            $user->habits()
+                ->where('is_active', true)
+                ->orderBy('position')
+                ->orderBy('id')
+                ->with('entries')
+                ->get(),
+            $today,
+        );
 
         return Inertia::render('Habits', [
             'habits' => $habits,
@@ -97,45 +97,5 @@ class HabitController extends Controller
         }
 
         return back();
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function present(Habit $habit, CarbonImmutable $today): array
-    {
-        $dates = $habit->entries
-            ->map(fn (HabitEntry $entry): string => $entry->entry_date->toDateString())
-            ->all();
-
-        $gridStart = $today->subDays(139)->toDateString();
-        $recent = array_values(array_filter($dates, fn (string $date): bool => $date >= $gridStart));
-
-        return [
-            'id' => $habit->id,
-            'name' => $habit->name,
-            'cadence' => $habit->cadence->value,
-            'target_per_period' => $habit->target_per_period,
-            'color' => $habit->color,
-            'icon' => $habit->icon,
-            'position' => $habit->position,
-            'current_streak' => $this->streaks->current($dates, $today, $habit->cadence),
-            'longest_streak' => $this->streaks->longest($dates, $habit->cadence),
-            'done_today' => $this->doneThisPeriod($dates, $today, $habit->cadence),
-            'entries' => $recent,
-        ];
-    }
-
-    /**
-     * @param  array<int, string>  $dates
-     */
-    private function doneThisPeriod(array $dates, CarbonImmutable $today, HabitCadence $cadence): bool
-    {
-        return match ($cadence) {
-            HabitCadence::Daily => in_array($today->toDateString(), $dates, true),
-            HabitCadence::Weekly => collect($dates)->contains(
-                fn (string $date): bool => CarbonImmutable::parse($date)->startOfWeek()->equalTo($today->startOfWeek()),
-            ),
-        };
     }
 }

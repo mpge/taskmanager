@@ -8,6 +8,7 @@ use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
 use App\Models\User;
+use App\Support\TaskPresenter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -16,6 +17,8 @@ use Inertia\Response;
 
 class TaskController extends Controller
 {
+    public function __construct(private readonly TaskPresenter $presenter) {}
+
     public function index(Request $request): Response
     {
         $user = $request->user();
@@ -96,31 +99,13 @@ class TaskController extends Controller
      */
     private function lane(User $user, TaskBucket $bucket): array
     {
-        return $user->tasks()
-            ->where('bucket', $bucket)
-            ->where('status', TaskStatus::Open)
-            ->orderBy('position')
-            ->orderBy('id')
-            ->get()
-            ->map(fn (Task $task): array => $this->present($task))
-            ->all();
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function present(Task $task): array
-    {
-        return [
-            'id' => $task->id,
-            'title' => $task->title,
-            'notes' => $task->notes,
-            'bucket' => $task->bucket->value,
-            'status' => $task->status->value,
-            'priority' => $task->priority,
-            'due_date' => $task->due_date?->toDateString(),
-            'completed_at' => $task->completed_at?->toIso8601String(),
-            'position' => $task->position,
-        ];
+        return $this->presenter->collection(
+            $user->tasks()
+                ->where('bucket', $bucket)
+                ->where('status', TaskStatus::Open)
+                ->orderBy('position')
+                ->orderBy('id')
+                ->get()
+        );
     }
 }
