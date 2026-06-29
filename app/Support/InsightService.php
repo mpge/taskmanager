@@ -144,7 +144,7 @@ class InsightService
                 ->all();
 
             $doneToday = in_array($today->toDateString(), $dates, true);
-            $streak = $this->streaks->current($dates, $today, $habit->cadence);
+            $streak = $this->streaks->current($dates, $today, $habit->cadence, $habit->target_per_period);
 
             if ($streak >= 2 && ! $doneToday) {
                 $atRisk[] = "{$habit->name} ({$streak} days)";

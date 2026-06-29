@@ -36,9 +36,9 @@ final class HabitPresenter
             'color' => $habit->color,
             'icon' => $habit->icon,
             'position' => $habit->position,
-            'current_streak' => $this->streaks->current($dates, $today, $habit->cadence),
-            'longest_streak' => $this->streaks->longest($dates, $habit->cadence),
-            'done_today' => $this->doneThisPeriod($dates, $today, $habit->cadence),
+            'current_streak' => $this->streaks->current($dates, $today, $habit->cadence, $habit->target_per_period),
+            'longest_streak' => $this->streaks->longest($dates, $habit->cadence, $habit->target_per_period),
+            'done_today' => $this->doneThisPeriod($dates, $today, $habit->cadence, $habit->target_per_period),
             'entries' => $recent,
         ];
     }
@@ -61,13 +61,13 @@ final class HabitPresenter
     /**
      * @param  array<int, string>  $dates
      */
-    private function doneThisPeriod(array $dates, CarbonImmutable $today, HabitCadence $cadence): bool
+    private function doneThisPeriod(array $dates, CarbonImmutable $today, HabitCadence $cadence, int $target): bool
     {
         return match ($cadence) {
             HabitCadence::Daily => in_array($today->toDateString(), $dates, true),
-            HabitCadence::Weekly => collect($dates)->contains(
+            HabitCadence::Weekly => collect($dates)->filter(
                 fn (string $date): bool => CarbonImmutable::parse($date)->startOfWeek()->equalTo($today->startOfWeek()),
-            ),
+            )->count() >= $target,
         };
     }
 }

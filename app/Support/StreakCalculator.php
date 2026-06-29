@@ -9,7 +9,9 @@ use Carbon\CarbonImmutable;
  * Computes habit streaks from a list of completion dates.
  *
  * A "period" is a day for daily habits and an ISO week (Mon-Sun) for weekly
- * habits. A period counts as completed if it contains at least one entry.
+ * habits. A period counts as completed when it contains at least `$target`
+ * entries (1 by default, so daily habits and single-target weekly habits behave
+ * as a simple "done at least once").
  */
 class StreakCalculator
 {
@@ -22,27 +24,28 @@ class StreakCalculator
      *
      * @param  array<int, string>  $dates  completion dates as 'Y-m-d'
      */
-    public function current(array $dates, CarbonImmutable $today, HabitCadence $cadence): int
+    public function current(array $dates, CarbonImmutable $today, HabitCadence $cadence, int $target = 1): int
     {
-        $periods = $this->periodKeys($dates, $cadence);
+        $completed = $this->completedPeriods($dates, $cadence, $target);
 
-        if ($periods === []) {
+        if ($completed === []) {
             return 0;
         }
 
+        $set = array_flip($completed);
         $cursor = $this->periodStart($today, $cadence);
 
-        if (! in_array($this->key($cursor), $periods, true)) {
+        if (! isset($set[$this->key($cursor)])) {
             $cursor = $this->step($cursor, $cadence, -1);
 
-            if (! in_array($this->key($cursor), $periods, true)) {
+            if (! isset($set[$this->key($cursor)])) {
                 return 0;
             }
         }
 
         $streak = 0;
 
-        while (in_array($this->key($cursor), $periods, true)) {
+        while (isset($set[$this->key($cursor)])) {
             $streak++;
             $cursor = $this->step($cursor, $cadence, -1);
         }
@@ -55,17 +58,17 @@ class StreakCalculator
      *
      * @param  array<int, string>  $dates  completion dates as 'Y-m-d'
      */
-    public function longest(array $dates, HabitCadence $cadence): int
+    public function longest(array $dates, HabitCadence $cadence, int $target = 1): int
     {
-        $periods = $this->periodKeys($dates, $cadence);
+        $completed = $this->completedPeriods($dates, $cadence, $target);
 
-        if ($periods === []) {
+        if ($completed === []) {
             return 0;
         }
 
         $starts = array_map(
             fn (string $key): CarbonImmutable => CarbonImmutable::parse($key),
-            $periods,
+            $completed,
         );
         usort($starts, fn (CarbonImmutable $a, CarbonImmutable $b): int => $a <=> $b);
 
@@ -83,19 +86,29 @@ class StreakCalculator
     }
 
     /**
-     * Unique period keys (each a 'Y-m-d' period-start date) for the given dates.
+     * Period-start keys ('Y-m-d') for periods with at least `$target` entries.
      *
      * @param  array<int, string>  $dates
      * @return array<int, string>
      */
-    private function periodKeys(array $dates, HabitCadence $cadence): array
+    private function completedPeriods(array $dates, HabitCadence $cadence, int $target): array
     {
-        $keys = array_map(
-            fn (string $date): string => $this->key($this->periodStart(CarbonImmutable::parse($date), $cadence)),
-            $dates,
-        );
+        $counts = [];
 
-        return array_values(array_unique($keys));
+        foreach ($dates as $date) {
+            $key = $this->key($this->periodStart(CarbonImmutable::parse($date), $cadence));
+            $counts[$key] = ($counts[$key] ?? 0) + 1;
+        }
+
+        $completed = [];
+
+        foreach ($counts as $key => $count) {
+            if ($count >= $target) {
+                $completed[] = $key;
+            }
+        }
+
+        return $completed;
     }
 
     private function periodStart(CarbonImmutable $date, HabitCadence $cadence): CarbonImmutable
