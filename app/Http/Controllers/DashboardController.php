@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Enums\TaskBucket;
 use App\Enums\TaskStatus;
+use App\Models\Task;
 use App\Models\User;
 use App\Support\HabitPresenter;
 use App\Support\Insight;
 use App\Support\InsightService;
 use App\Support\TaskPresenter;
+use App\Support\TaskRanker;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -27,17 +29,10 @@ class DashboardController extends Controller
         $user = $request->user();
         \assert($user instanceof User);
 
-        $today = CarbonImmutable::now();
+        $today = CarbonImmutable::now($user->timezone);
 
-        $focus = $user->tasks()
-            ->where('status', TaskStatus::Open)
-            ->where('bucket', TaskBucket::Important)
-            ->orderByDesc('priority')
-            ->orderByRaw('due_date is null')
-            ->orderBy('due_date')
-            ->orderBy('position')
-            ->limit(5)
-            ->get();
+        // Load once and share with InsightService to avoid re-querying.
+        $openTasks = $user->tasks()->where('status', TaskStatus::Open)->get();
 
         $habits = $user->habits()
             ->where('is_active', true)
@@ -48,8 +43,13 @@ class DashboardController extends Controller
 
         $insights = array_map(
             fn (Insight $insight): array => $insight->toArray(),
-            $this->insights->for($user, $today),
+            $this->insights->for($user, $today, $openTasks, $habits),
         );
+
+        $importantOpen = $openTasks
+            ->filter(fn (Task $task): bool => $task->bucket === TaskBucket::Important)
+            ->all();
+        $focus = array_slice(TaskRanker::focusOrder($importantOpen), 0, 5);
 
         $presentedHabits = $this->habitPresenter->collection($habits, $today);
         $habitsDoneToday = count(array_filter(
@@ -58,14 +58,14 @@ class DashboardController extends Controller
         ));
 
         return Inertia::render('Dashboard', [
-            'today' => $today->toIso8601String(),
+            'today' => $today->toDateString(),
             'greetingName' => $user->name,
             'insights' => $insights,
             'focus' => $this->taskPresenter->collection($focus),
             'habits' => $presentedHabits,
             'stats' => [
-                'important_open' => $user->tasks()->where('status', TaskStatus::Open)->where('bucket', TaskBucket::Important)->count(),
-                'eventual_open' => $user->tasks()->where('status', TaskStatus::Open)->where('bucket', TaskBucket::Eventual)->count(),
+                'important_open' => count($importantOpen),
+                'eventual_open' => $openTasks->filter(fn (Task $task): bool => $task->bucket === TaskBucket::Eventual)->count(),
                 'habits_total' => count($presentedHabits),
                 'habits_done_today' => $habitsDoneToday,
             ],

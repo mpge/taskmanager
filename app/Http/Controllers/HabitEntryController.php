@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Habit;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
@@ -18,14 +19,19 @@ class HabitEntryController extends Controller
     {
         Gate::authorize('update', $habit);
 
+        $user = $request->user();
+        \assert($user instanceof User);
+
+        $today = CarbonImmutable::now($user->timezone);
+
         /** @var array{date?: string|null} $validated */
         $validated = $request->validate([
-            'date' => ['nullable', 'date', 'before_or_equal:today'],
+            'date' => ['nullable', 'date', 'before_or_equal:'.$today->toDateString()],
         ]);
 
         $date = isset($validated['date'])
             ? CarbonImmutable::parse($validated['date'])->toDateString()
-            : CarbonImmutable::now()->toDateString();
+            : $today->toDateString();
 
         $existing = $habit->entries()->whereDate('entry_date', $date)->first();
 

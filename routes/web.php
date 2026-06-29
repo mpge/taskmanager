@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HabitController;
 use App\Http\Controllers\HabitEntryController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TimezoneController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
@@ -23,6 +24,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('habits/{habit}', [HabitController::class, 'update'])->name('habits.update');
     Route::delete('habits/{habit}', [HabitController::class, 'destroy'])->name('habits.destroy');
     Route::post('habits/{habit}/toggle', [HabitEntryController::class, 'toggle'])->name('habits.toggle');
+
+    Route::patch('preferences/timezone', [TimezoneController::class, 'update'])->name('preferences.timezone');
 });
 
 require __DIR__.'/settings.php';

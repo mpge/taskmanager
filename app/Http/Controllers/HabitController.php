@@ -25,7 +25,7 @@ class HabitController extends Controller
         $user = $request->user();
         \assert($user instanceof User);
 
-        $today = CarbonImmutable::now();
+        $today = CarbonImmutable::now($user->timezone);
 
         $habits = $this->presenter->collection(
             $user->habits()

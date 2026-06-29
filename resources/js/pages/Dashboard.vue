@@ -71,7 +71,7 @@ const greeting = computed(() => {
 });
 
 const prettyDate = computed(() =>
-    new Date(props.today).toLocaleDateString('en', {
+    new Date(`${props.today}T00:00:00`).toLocaleDateString('en', {
         weekday: 'long',
         month: 'long',
         day: 'numeric',

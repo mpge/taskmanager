@@ -34,6 +34,7 @@ interface TaskItem {
 }
 
 const props = defineProps<{
+    today: string;
     important: TaskItem[];
     eventual: TaskItem[];
 }>();
@@ -209,10 +210,7 @@ function isOverdue(date: string | null): boolean {
         return false;
     }
 
-    const today = new Date();
-    const todayYmd = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-    return date < todayYmd;
+    return date < props.today;
 }
 
 function formatDue(date: string): string {

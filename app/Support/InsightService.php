@@ -32,15 +32,17 @@ class InsightService
     public function __construct(private readonly StreakCalculator $streaks) {}
 
     /**
+     * Callers that have already loaded the user's open tasks / active habits
+     * (e.g. the dashboard) can pass them in to avoid re-querying.
+     *
+     * @param  Collection<int, Task>|null  $openTasks
+     * @param  Collection<int, Habit>|null  $habits
      * @return array<int, Insight>
      */
-    public function for(User $user, CarbonImmutable $today): array
+    public function for(User $user, CarbonImmutable $today, ?Collection $openTasks = null, ?Collection $habits = null): array
     {
-        /** @var Collection<int, Task> $openTasks */
-        $openTasks = $user->tasks()->where('status', TaskStatus::Open)->get();
-
-        /** @var Collection<int, Habit> $habits */
-        $habits = $user->habits()->where('is_active', true)->with('entries')->get();
+        $openTasks ??= $user->tasks()->where('status', TaskStatus::Open)->get();
+        $habits ??= $user->habits()->where('is_active', true)->with('entries')->get();
 
         $insights = array_filter([
             $this->overdue($openTasks, $today),
@@ -101,18 +103,7 @@ class InsightService
     {
         $important = $openTasks->filter(fn (Task $task): bool => $task->bucket === TaskBucket::Important)->all();
 
-        usort($important, function (Task $a, Task $b): int {
-            if ($a->priority !== $b->priority) {
-                return $b->priority <=> $a->priority;
-            }
-
-            $aDue = $a->due_date?->toDateString() ?? '9999-12-31';
-            $bDue = $b->due_date?->toDateString() ?? '9999-12-31';
-
-            return $aDue !== $bDue ? $aDue <=> $bDue : $a->position <=> $b->position;
-        });
-
-        $top = array_slice($important, 0, self::FOCUS_LIMIT);
+        $top = array_slice(TaskRanker::focusOrder($important), 0, self::FOCUS_LIMIT);
 
         if ($top === []) {
             return null;

@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
 use App\Models\User;
 use App\Support\TaskPresenter;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +27,7 @@ class TaskController extends Controller
         \assert($user instanceof User);
 
         return Inertia::render('Tasks', [
+            'today' => CarbonImmutable::now($user->timezone)->toDateString(),
             'important' => $this->lane($user, TaskBucket::Important),
             'eventual' => $this->lane($user, TaskBucket::Eventual),
         ]);
