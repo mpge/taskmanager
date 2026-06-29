@@ -189,7 +189,7 @@ function toggleHabit(id: number) {
                     >
                         <button
                             type="button"
-                            class="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-muted-foreground/40 transition-colors hover:border-success hover:bg-success/10"
+                            class="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-muted-foreground/40 transition-colors hover:border-success hover:bg-success/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                             aria-label="Complete task"
                             @click="completeTask(task.id)"
                         />

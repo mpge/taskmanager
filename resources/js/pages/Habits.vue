@@ -181,16 +181,18 @@ function toggle(habit: HabitItem) {
                     <div class="flex shrink-0 items-center">
                         <button
                             type="button"
-                            class="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground"
-                            title="Edit"
+                            class="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                            :title="`Edit ${habit.name}`"
+                            :aria-label="`Edit ${habit.name}`"
                             @click="openEdit(habit)"
                         >
                             <Pencil class="size-4" />
                         </button>
                         <button
                             type="button"
-                            class="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                            title="Delete"
+                            class="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                            :title="`Delete ${habit.name}`"
+                            :aria-label="`Delete ${habit.name}`"
                             @click="destroy(habit)"
                         >
                             <Trash2 class="size-4" />

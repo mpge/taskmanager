@@ -307,7 +307,7 @@ function formatDue(date: string): string {
                         />
                         <button
                             type="button"
-                            class="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-muted-foreground/40 transition-colors hover:border-success hover:bg-success/10"
+                            class="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-muted-foreground/40 transition-colors hover:border-success hover:bg-success/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                             aria-label="Complete task"
                             @click="completeTask(task)"
                         />
@@ -347,8 +347,13 @@ function formatDue(date: string): string {
                         >
                             <button
                                 type="button"
-                                class="flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground"
+                                class="flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                                 :title="
+                                    meta.key === 'important'
+                                        ? 'Move to Eventual'
+                                        : 'Move to Important'
+                                "
+                                :aria-label="
                                     meta.key === 'important'
                                         ? 'Move to Eventual'
                                         : 'Move to Important'
@@ -359,16 +364,18 @@ function formatDue(date: string): string {
                             </button>
                             <button
                                 type="button"
-                                class="flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground"
-                                title="Edit"
+                                class="flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                title="Edit task"
+                                aria-label="Edit task"
                                 @click="openEdit(task)"
                             >
                                 <Pencil class="size-4" />
                             </button>
                             <button
                                 type="button"
-                                class="flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                                title="Delete"
+                                class="flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                title="Delete task"
+                                aria-label="Delete task"
                                 @click="deleteTask(task)"
                             >
                                 <Trash2 class="size-4" />

@@ -17,7 +17,7 @@ defineEmits<{ toggle: [] }>();
     <button
         type="button"
         :aria-pressed="done"
-        class="flex shrink-0 items-center justify-center rounded-full border-2 transition-all duration-150 hover:scale-105 active:scale-90"
+        class="flex shrink-0 items-center justify-center rounded-full border-2 transition-all duration-150 hover:scale-105 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-90"
         :style="{
             width: `${size}px`,
             height: `${size}px`,

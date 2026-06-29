@@ -65,6 +65,14 @@ class TaskController extends Controller
             $task->completed_at = $data['status'] === TaskStatus::Done->value ? now() : null;
         }
 
+        // When moving to a different lane, drop the task at the bottom of the
+        // target lane so it doesn't collide with an existing position.
+        if (array_key_exists('bucket', $data) && $data['bucket'] !== $task->bucket->value) {
+            $user = $request->user();
+            \assert($user instanceof User);
+            $data['position'] = (int) $user->tasks()->where('bucket', $data['bucket'])->max('position') + 1;
+        }
+
         $task->fill($data)->save();
 
         return back();
