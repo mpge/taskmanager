@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HabitController;
 use App\Http\Controllers\HabitEntryController;
@@ -9,7 +10,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
 
+// Billing is reachable without an active subscription so users can subscribe.
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('billing', [BillingController::class, 'show'])->name('billing.show');
+    Route::post('billing/checkout', [BillingController::class, 'checkout'])->name('billing.checkout');
+    Route::get('billing/portal', [BillingController::class, 'portal'])->name('billing.portal');
+});
+
+Route::middleware(['auth', 'verified', 'subscribed'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('tasks', [TaskController::class, 'index'])->name('tasks.index');

@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnsureEmailVerifiedWhenRequired;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\RequireActiveSubscription;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -20,7 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         // Email verification is only enforced when require_email_verification is on.
-        $middleware->alias(['verified' => EnsureEmailVerifiedWhenRequired::class]);
+        // Subscription is only enforced when billing.enabled is on.
+        $middleware->alias([
+            'verified' => EnsureEmailVerifiedWhenRequired::class,
+            'subscribed' => RequireActiveSubscription::class,
+        ]);
 
         $middleware->web(append: [
             HandleAppearance::class,
